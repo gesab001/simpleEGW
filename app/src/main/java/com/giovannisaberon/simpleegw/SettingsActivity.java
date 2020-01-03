@@ -10,6 +10,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,8 +48,19 @@ public class SettingsActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         Resources res = getResources();
         String[] dataset = res.getStringArray(R.array.book_arrays);
+        String json_data = null;
+        EGWJson egwJson = new EGWJson(this);
+        try {
+            json_data = egwJson.loadJSONFromAsset("bookreferences.json");
+            JSONObject jsonObject = egwJson.getJsonObject(json_data);
+            mAdapter = new SettingsAdapter(dataset, jsonObject, this);
+            recyclerView.setAdapter(mAdapter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        mAdapter = new SettingsAdapter(dataset, this);
-        recyclerView.setAdapter(mAdapter);
+
     }
 }

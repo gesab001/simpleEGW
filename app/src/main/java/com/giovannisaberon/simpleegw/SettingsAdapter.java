@@ -13,9 +13,13 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.MyViewHolder> {
     private String[] mDataset;
     private Context context;
+    private JSONObject jsonObject;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -32,10 +36,11 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.MyView
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public SettingsAdapter(String[] myDataset, Context context) {
+    public SettingsAdapter(String[] myDataset, JSONObject jsonObject, Context context) {
 
         mDataset = myDataset;
         this.context = context;
+        this.jsonObject = jsonObject;
     }
 
     // Create new views (invoked by the layout manager)
@@ -60,8 +65,16 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.MyView
 //        holder.textView.setText(String.valueOf(position+1)+". " +item);
         final SharedPreferences pref = context.getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
         final SharedPreferences.Editor editor = pref.edit();
-        holder.bookswitch.setText(item);
-        Boolean bookIsOn = pref.getBoolean(holder.bookswitch.getText().toString(), false);
+        try {
+            holder.bookswitch.setText(jsonObject.getString(item)+"-"+item);
+            Log.i(jsonObject.getString(item), item);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String title = holder.bookswitch.getText().toString();
+        String[] titlesplit = title.split("-");
+        String code = titlesplit[1];
+        Boolean bookIsOn = pref.getBoolean(code, false);
         holder.bookswitch.setChecked(bookIsOn);
         holder.bookswitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -79,12 +92,14 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.MyView
 //                        Boolean bool = pref.getBoolean(mDataset[position], false);
 //                    }
                     Boolean checked = isChecked;
+                    String title = holder.bookswitch.getText().toString();
+                    String[] titlesplit = title.split("-");
                     Log.i(checked.toString(), holder.bookswitch.getText().toString());
 
-                        editor.putBoolean(holder.bookswitch.getText().toString(), checked); // Storing boolean - true/false
+                        editor.putBoolean(titlesplit[1], checked); // Storing boolean - true/false
                         editor.commit();
-                        Boolean choice = pref.getBoolean(holder.bookswitch.getText().toString(), false);
-                        Log.i(holder.bookswitch.getText().toString(), choice.toString());
+                        Boolean choice = pref.getBoolean(titlesplit[1], false);
+                        Log.i(titlesplit[1], choice.toString());
 
             }
         });

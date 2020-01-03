@@ -55,15 +55,7 @@ public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHo
         // - replace the contents of the view with that element
 
                 String item = mDataset.get(position);
-                SharedPreferences pref = context.getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
-                Boolean choice = pref.getBoolean(item, false);
-//
-                if(choice){
-                    holder.textView.setText(item);
-                    SharedPreferences.Editor editor = pref.edit();
-                    editor.putBoolean(item, true);
-                    editor.commit();
-                }
+                holder.textView.setText(item);
 
     }
 

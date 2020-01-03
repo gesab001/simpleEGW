@@ -21,12 +21,12 @@ public class EGWJson {
         this.context = context;
     }
 
-    public String loadJSONFromAsset() throws IOException {
+    public String loadJSONFromAsset(String filename) throws IOException {
         String json = "there is nothing";
         AssetManager am = context.getAssets();
 
         try {
-            InputStream is = am.open("filename.json");
+            InputStream is = am.open(filename);
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -50,8 +50,8 @@ public class EGWJson {
         return json;
     }
 
-    public JSONObject getJsonBible(String bible) throws JSONException {
-        JSONObject obj = new JSONObject(bible);
+    public JSONObject getJsonObject(String file) throws JSONException {
+        JSONObject obj = new JSONObject(file);
         return obj;
     }
 

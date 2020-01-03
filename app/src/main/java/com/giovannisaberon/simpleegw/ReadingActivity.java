@@ -7,9 +7,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class ReadingActivity extends AppCompatActivity {
@@ -43,13 +48,30 @@ public class ReadingActivity extends AppCompatActivity {
         String[] dataset = res.getStringArray(R.array.book_arrays);
         ArrayList<String> selectedbooks = new ArrayList<String>(){};
         SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
-
+        String json_data = null;
+        EGWJson egwJson = new EGWJson(this);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            json_data = egwJson.loadJSONFromAsset("bookreferences.json");
+            jsonObject = egwJson.getJsonObject(json_data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
         for(int i=0; i<dataset.length; i++){
             String book = dataset[i];
             Boolean choice = pref.getBoolean(book, false);
 //
             if(choice){
-                selectedbooks.add(book);
+                try {
+                    String title = jsonObject.getString(book);
+                    Log.i("adding", title);
+                    selectedbooks.add(title);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
 
