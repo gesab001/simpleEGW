@@ -12,8 +12,10 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHolder> {
-    private String[] mDataset;
+    private ArrayList<String> mDataset;
     private Context context;
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -28,7 +30,7 @@ public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHo
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public ReadingAdapter(String[] myDataset, Context context) {
+    public ReadingAdapter(ArrayList<String> myDataset, Context context) {
 
         mDataset = myDataset;
         this.context = context;
@@ -52,18 +54,22 @@ public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHo
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
 
-                String item = mDataset[position];
-                SharedPreferences pref = context.getSharedPreferences("MyPref", 0); // 0 - for private mode
+                String item = mDataset.get(position);
+                SharedPreferences pref = context.getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
                 Boolean choice = pref.getBoolean(item, false);
-
-                if(choice) {
+//
+                if(choice){
                     holder.textView.setText(item);
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putBoolean(item, true);
+                    editor.commit();
                 }
+
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mDataset.length;
+        return mDataset.size();
     }
 }
