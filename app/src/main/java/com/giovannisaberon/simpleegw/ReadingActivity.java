@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,12 +17,17 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class ReadingActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private ReadingAdapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
+    ArrayList<String> selectedbooks = new ArrayList<String>(){};
+    ArrayList<String> reorderedList = new ArrayList<String>(){};
+
+    ItemTouchHelper touchHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +52,17 @@ public class ReadingActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         Resources res = getResources();
         String[] dataset = res.getStringArray(R.array.book_arrays);
-        ArrayList<String> selectedbooks = new ArrayList<String>(){};
-        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+
+        if(pref.contains("reorderedList")){
+            String list = pref.getString("reorderedList", null);
+            String[] array = list.split("@");
+            for (int i=0; i<array.length; i++){
+                reorderedList.add(array[i]);// 0 - for private mode
+            }
+            Log.i("reordered list", reorderedList.toString());
+
+        }
         String json_data = null;
         EGWJson egwJson = new EGWJson(this);
         JSONObject jsonObject = new JSONObject();
@@ -77,7 +92,42 @@ public class ReadingActivity extends AppCompatActivity {
 
         }
 
-        mAdapter = new ReadingAdapter(selectedbooks, this);
+
+        if (reorderedList.isEmpty()){
+            mAdapter = new ReadingAdapter(selectedbooks, this);
+
+        }
+        else{
+            ArrayList<String> removeitems = new ArrayList<String>(){};
+            for (String book : reorderedList) {
+                if (selectedbooks.contains(book)) {
+                    Log.i("already in the list", book);
+
+                } else {
+                    removeitems.add(book);
+                    Log.i("remove book", book);
+
+                }
+            }
+
+            reorderedList.removeAll(removeitems);
+            ArrayList<String> additems = new ArrayList<String>(){};
+
+            for (String book: selectedbooks){
+                if (reorderedList.contains(book)){
+
+                }else{
+                    additems.add(book);
+                }
+            }
+            reorderedList.addAll(additems);
+            mAdapter = new ReadingAdapter(reorderedList, this);
+
+        }
+        ItemTouchHelper.Callback callback =
+                new ItemMoveCallback(mAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(mAdapter);
     }
 }

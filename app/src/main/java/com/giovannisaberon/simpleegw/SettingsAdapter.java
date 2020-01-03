@@ -16,6 +16,8 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.MyViewHolder> {
     private String[] mDataset;
     private Context context;
@@ -99,6 +101,7 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.MyView
                         editor.putBoolean(titlesplit[1], checked); // Storing boolean - true/false
                         editor.commit();
                         Boolean choice = pref.getBoolean(titlesplit[1], false);
+
                         Log.i(titlesplit[1], choice.toString());
 
             }
