@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,6 +15,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class EGWJson {
 
@@ -40,6 +45,13 @@ public class EGWJson {
         return json;
     }
 
+    public HashMap<String, ArrayList<HashMap>> convertToHashmap() throws IOException {
+        InputStream is = context.getAssets().open("egw.json");
+        JsonReader reader = new JsonReader(new InputStreamReader(is));
+        final Gson gson = new Gson();
+        HashMap<String, ArrayList<HashMap>> map = gson.fromJson(reader, HashMap.class);
+        return map;
+    }
     public String JsonData(){
 
 

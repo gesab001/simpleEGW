@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
     private ArrayList<String> mDataset;
@@ -61,6 +62,7 @@ public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHo
         // - replace the contents of the view with that element
 
                 String item = mDataset.get(position);
+//                String word = selectedparagraphs.get(position).get("word").toString();
                 holder.textView.setText(item);
 
     }

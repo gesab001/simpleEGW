@@ -12,11 +12,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class ReadingActivity extends AppCompatActivity {
@@ -26,6 +28,7 @@ public class ReadingActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     ArrayList<String> selectedbooks = new ArrayList<String>(){};
     ArrayList<String> reorderedList = new ArrayList<String>(){};
+    JSONObject jsonWritings = new JSONObject();
 
     ItemTouchHelper touchHelper;
 
@@ -69,6 +72,13 @@ public class ReadingActivity extends AppCompatActivity {
         try {
             json_data = egwJson.loadJSONFromAsset("bookreferences.json");
             jsonObject = egwJson.getJsonObject(json_data);
+//            json_data = egwJson.loadJSONFromAsset("egw.json");
+            HashMap<String, ArrayList<HashMap>> egwmap = egwJson.convertToHashmap();
+            ArrayList<HashMap> book = egwmap.get("DA");
+            HashMap map = book.get(3);
+            String word = map.get("word").toString();
+            Log.i("word",word);
+//            jsonWritings = egwJson.getJsonObject(json_data);
         } catch (IOException e) {
             e.printStackTrace();
         }catch (JSONException e) {
@@ -121,6 +131,16 @@ public class ReadingActivity extends AppCompatActivity {
                 }
             }
             reorderedList.addAll(additems);
+//            ArrayList<String> words = new ArrayList<String>(){};
+//            for (String code : reorderedList){
+//                try {
+//                    JSONArray jsonArray= jsonWritings.getJSONArray(code);
+//                    String word = jsonArray.get(3).toString();
+//                    words.add(word);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
             mAdapter = new ReadingAdapter(reorderedList, this);
 
         }
