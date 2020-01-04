@@ -13,15 +13,19 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.gson.internal.LinkedTreeMap;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
 public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
     private ArrayList<String> mDataset;
+    private ArrayList<LinkedTreeMap<Object,Object>> selectedparagraphs;
     private Context context;
     private SharedPreferences pref;  // 0 - for private mode
     private SharedPreferences.Editor editor;
+
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
@@ -37,10 +41,11 @@ public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHo
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public ReadingAdapter(ArrayList<String> myDataset, Context context) {
+    public ReadingAdapter(ArrayList<String> myDataset, ArrayList<LinkedTreeMap<Object,Object>> selectedparagraphs, Context context) {
 
         mDataset = myDataset;
         this.context = context;
+        this.selectedparagraphs = selectedparagraphs;
     }
 
     // Create new views (invoked by the layout manager)
@@ -62,8 +67,11 @@ public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHo
         // - replace the contents of the view with that element
 
                 String item = mDataset.get(position);
+                LinkedTreeMap<Object,Object> paragraphitem = selectedparagraphs.get(position);
+                String word = paragraphitem.get("word").toString();
 //                String word = selectedparagraphs.get(position).get("word").toString();
-                holder.textView.setText(item);
+                holder.textView.setText(item + "\n" + word);
+
 
     }
 

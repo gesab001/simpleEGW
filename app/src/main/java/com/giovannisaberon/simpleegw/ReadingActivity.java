@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.gson.internal.LinkedTreeMap;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,7 +31,8 @@ public class ReadingActivity extends AppCompatActivity {
     ArrayList<String> selectedbooks = new ArrayList<String>(){};
     ArrayList<String> reorderedList = new ArrayList<String>(){};
     JSONObject jsonWritings = new JSONObject();
-
+    ArrayList<LinkedTreeMap<Object,Object>> selectedparagraphs = new ArrayList<LinkedTreeMap<Object,Object>>();
+    HashMap<String, ArrayList<LinkedTreeMap<Object,Object>>> egwmap = new HashMap<String, ArrayList<LinkedTreeMap<Object,Object>>>();
     ItemTouchHelper touchHelper;
 
     @Override
@@ -73,11 +76,8 @@ public class ReadingActivity extends AppCompatActivity {
             json_data = egwJson.loadJSONFromAsset("bookreferences.json");
             jsonObject = egwJson.getJsonObject(json_data);
 //            json_data = egwJson.loadJSONFromAsset("egw.json");
-            HashMap<String, ArrayList<HashMap>> egwmap = egwJson.convertToHashmap();
-            ArrayList<HashMap> book = egwmap.get("DA");
-            HashMap map = book.get(3);
-            String word = map.get("word").toString();
-            Log.i("word",word);
+            egwmap = egwJson.convertToHashmap();
+
 //            jsonWritings = egwJson.getJsonObject(json_data);
         } catch (IOException e) {
             e.printStackTrace();
@@ -93,6 +93,11 @@ public class ReadingActivity extends AppCompatActivity {
                     String title = jsonObject.getString(book);
                     Log.i("adding", title);
                     selectedbooks.add(title);
+                    ArrayList<LinkedTreeMap<Object,Object>> getbook = egwmap.get(book);
+                    LinkedTreeMap<Object,Object> getparagraph = (LinkedTreeMap) getbook.get(3);
+                    selectedparagraphs.add(getparagraph);
+                    String word = getparagraph.get("word").toString();
+                    Log.i("word", word);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -104,7 +109,7 @@ public class ReadingActivity extends AppCompatActivity {
 
 
         if (reorderedList.isEmpty()){
-            mAdapter = new ReadingAdapter(selectedbooks, this);
+            mAdapter = new ReadingAdapter(selectedbooks, selectedparagraphs, this);
 
         }
         else{
@@ -141,7 +146,7 @@ public class ReadingActivity extends AppCompatActivity {
 //                    e.printStackTrace();
 //                }
 //            }
-            mAdapter = new ReadingAdapter(reorderedList, this);
+            mAdapter = new ReadingAdapter(reorderedList, selectedparagraphs, this);
 
         }
         ItemTouchHelper.Callback callback =

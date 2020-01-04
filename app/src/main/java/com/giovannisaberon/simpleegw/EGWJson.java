@@ -5,6 +5,7 @@ import android.content.res.AssetManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.stream.JsonReader;
 
 import org.json.JSONArray;
@@ -45,11 +46,11 @@ public class EGWJson {
         return json;
     }
 
-    public HashMap<String, ArrayList<HashMap>> convertToHashmap() throws IOException {
+    public HashMap<String, ArrayList<LinkedTreeMap<Object,Object>>> convertToHashmap() throws IOException {
         InputStream is = context.getAssets().open("egw.json");
         JsonReader reader = new JsonReader(new InputStreamReader(is));
         final Gson gson = new Gson();
-        HashMap<String, ArrayList<HashMap>> map = gson.fromJson(reader, HashMap.class);
+        HashMap<String, ArrayList<LinkedTreeMap<Object,Object>>> map = gson.fromJson(reader, HashMap.class);
         return map;
     }
     public String JsonData(){
