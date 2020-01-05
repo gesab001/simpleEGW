@@ -19,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,7 +32,7 @@ public class ReadingActivity extends AppCompatActivity {
     ArrayList<String> selectedbooks = new ArrayList<String>(){};
     ArrayList<String> reorderedList = new ArrayList<String>(){};
     JSONObject jsonWritings = new JSONObject();
-    ArrayList<LinkedTreeMap<Object,Object>> selectedparagraphs = new ArrayList<LinkedTreeMap<Object,Object>>();
+    HashMap<String, EGWData> selectedparagraphs = new HashMap<String, EGWData>();
     HashMap<String, ArrayList<LinkedTreeMap<Object,Object>>> egwmap = new HashMap<String, ArrayList<LinkedTreeMap<Object,Object>>>();
     ItemTouchHelper touchHelper;
 
@@ -51,7 +52,7 @@ public class ReadingActivity extends AppCompatActivity {
 //
 //        // use this setting to improve performance if you know that changes
 //        // in content do not change the layout size of the RecyclerView
-        recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(false);
 
         // use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
@@ -71,6 +72,7 @@ public class ReadingActivity extends AppCompatActivity {
         }
         String json_data = null;
         EGWJson egwJson = new EGWJson(this);
+        EGWData egwData;
         JSONObject jsonObject = new JSONObject();
         try {
             json_data = egwJson.loadJSONFromAsset("bookreferences.json");
@@ -81,23 +83,37 @@ public class ReadingActivity extends AppCompatActivity {
 //            jsonWritings = egwJson.getJsonObject(json_data);
         } catch (IOException e) {
             e.printStackTrace();
-        }catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
+//        }catch (JSONException e) {
+//            e.printStackTrace();
+//        }
         for(int i=0; i<dataset.length; i++){
             String book = dataset[i];
             Boolean choice = pref.getBoolean(book, false);
 //
             if(choice){
                 try {
-                    String title = jsonObject.getString(book);
-                    Log.i("adding", title);
-                    selectedbooks.add(title);
+//
+                    Log.i("adding", book);
+                    selectedbooks.add(book);
                     ArrayList<LinkedTreeMap<Object,Object>> getbook = egwmap.get(book);
                     LinkedTreeMap<Object,Object> getparagraph = (LinkedTreeMap) getbook.get(3);
-                    selectedparagraphs.add(getparagraph);
+                    int id = 3;
+                    String bookcode = book.toString();
+                    String title = jsonObject.getString(book);
+                    double page = (Double) getparagraph.get("page");
+                    double paragraph = (Double) getparagraph.get("paragraph");
+                    int pageint = (int) page;
+                    int paragraphint = (int) paragraph;
                     String word = getparagraph.get("word").toString();
+                    egwData = new EGWData(id, bookcode, title, pageint, paragraphint, word);
+                    Log.i("egwData", egwData.toString());
+                    selectedparagraphs.put(bookcode, egwData);
+
                     Log.i("word", word);
+                    Log.i("page", getparagraph.get("page").toString());
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -109,6 +125,7 @@ public class ReadingActivity extends AppCompatActivity {
 
 
         if (reorderedList.isEmpty()){
+            Log.i("selectedparagraphs", Integer.toString(selectedparagraphs.size()));
             mAdapter = new ReadingAdapter(selectedbooks, selectedparagraphs, this);
 
         }
@@ -146,6 +163,8 @@ public class ReadingActivity extends AppCompatActivity {
 //                    e.printStackTrace();
 //                }
 //            }
+            Log.i("selectedparagraphs", Integer.toString(selectedparagraphs.size()));
+            Log.i("reorderedlist final", Integer.toString(reorderedList.size()));
             mAdapter = new ReadingAdapter(reorderedList, selectedparagraphs, this);
 
         }

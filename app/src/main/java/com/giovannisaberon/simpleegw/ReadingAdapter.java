@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
     private ArrayList<String> mDataset;
-    private ArrayList<LinkedTreeMap<Object,Object>> selectedparagraphs;
+    private HashMap<String, EGWData> selectedparagraphs;
     private Context context;
     private SharedPreferences pref;  // 0 - for private mode
     private SharedPreferences.Editor editor;
@@ -41,7 +41,7 @@ public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHo
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public ReadingAdapter(ArrayList<String> myDataset, ArrayList<LinkedTreeMap<Object,Object>> selectedparagraphs, Context context) {
+    public ReadingAdapter(ArrayList<String> myDataset, HashMap<String, EGWData> selectedparagraphs, Context context) {
 
         mDataset = myDataset;
         this.context = context;
@@ -67,10 +67,10 @@ public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHo
         // - replace the contents of the view with that element
 
                 String item = mDataset.get(position);
-                LinkedTreeMap<Object,Object> paragraphitem = selectedparagraphs.get(position);
-                String word = paragraphitem.get("word").toString();
+                EGWData egwData = selectedparagraphs.get(item);
+                String word = egwData.getWord().toString();
 //                String word = selectedparagraphs.get(position).get("word").toString();
-                holder.textView.setText(item + "\n" + word);
+                holder.textView.setText(item + "\n" + egwData.toString());
 
 
     }
