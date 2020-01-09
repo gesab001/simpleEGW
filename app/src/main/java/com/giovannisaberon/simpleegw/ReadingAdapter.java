@@ -32,11 +32,13 @@ public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHo
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         public TextView textView;
+        public TextView textViewTitle;
         View rowView;
         public MyViewHolder(View v) {
             super(v);
             rowView = v;
             textView =  v.findViewById(R.id.textView);
+            textViewTitle = v.findViewById(R.id.title);
         }
     }
 
@@ -68,9 +70,8 @@ public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHo
 
                 String item = mDataset.get(position);
                 EGWData egwData = selectedparagraphs.get(item);
-                String word = egwData.getWord().toString();
-//                String word = selectedparagraphs.get(position).get("word").toString();
-                holder.textView.setText(item + "\n" + egwData.toString());
+                holder.textViewTitle.setText(egwData.getTitle());
+                holder.textView.setText(egwData.toString());
 
 
     }

@@ -29,8 +29,8 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         final Intent readingIntent = new Intent(this, ReadingActivity.class);
 
-        Button reading_button = (Button) findViewById(R.id.reading_button);
-        reading_button.setOnClickListener(new View.OnClickListener() {
+        Button back_button = (Button) findViewById(R.id.back_button);
+        back_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Code here executes on main thread after user presses button
                 startActivity(readingIntent);

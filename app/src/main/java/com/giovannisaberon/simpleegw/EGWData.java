@@ -67,7 +67,7 @@ public class EGWData {
 
 
     public String toString(){
-        String string = this.title + "\n" + this.word + " \n(" + this.bookcode + " " + this.page + ", " + this.paragraph + ")";
+        String string = this.word + " (" + this.bookcode + " " + this.page + ", " + this.paragraph + ")";
         return string;
     }
 

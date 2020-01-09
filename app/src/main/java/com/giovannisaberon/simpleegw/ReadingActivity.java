@@ -19,10 +19,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
 
 public class ReadingActivity extends AppCompatActivity {
 
@@ -35,7 +38,14 @@ public class ReadingActivity extends AppCompatActivity {
     HashMap<String, EGWData> selectedparagraphs = new HashMap<String, EGWData>();
     HashMap<String, ArrayList<LinkedTreeMap<Object,Object>>> egwmap = new HashMap<String, ArrayList<LinkedTreeMap<Object,Object>>>();
     ItemTouchHelper touchHelper;
-
+    JSONObject jsontotalparagraphs = new JSONObject();
+    JSONObject jsonstartingdate = new JSONObject();
+    String json_data = null;
+    EGWJson egwJson;
+    EGWData egwData;
+    JSONObject jsonObject = new JSONObject();
+    String[] dataset;
+    SharedPreferences pref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,18 +58,18 @@ public class ReadingActivity extends AppCompatActivity {
                 startActivity(readingIntent);
             }
         });
-        recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-//
-//        // use this setting to improve performance if you know that changes
-//        // in content do not change the layout size of the RecyclerView
-        recyclerView.setHasFixedSize(false);
 
-        // use a linear layout manager
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
+        Button refresh_button = (Button) findViewById(R.id.refresh_button);
+        refresh_button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Code here executes on main thread after user presses button
+                loadRecyclerView();
+            }
+        });
+
         Resources res = getResources();
-        String[] dataset = res.getStringArray(R.array.book_arrays);
-        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        dataset = res.getStringArray(R.array.book_arrays);
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
 
         if(pref.contains("reorderedList")){
             String list = pref.getString("reorderedList", null);
@@ -70,13 +80,15 @@ public class ReadingActivity extends AppCompatActivity {
             Log.i("reordered list", reorderedList.toString());
 
         }
-        String json_data = null;
-        EGWJson egwJson = new EGWJson(this);
-        EGWData egwData;
-        JSONObject jsonObject = new JSONObject();
+
+        egwJson = new EGWJson(this);
         try {
             json_data = egwJson.loadJSONFromAsset("bookreferences.json");
             jsonObject = egwJson.getJsonObject(json_data);
+            json_data = egwJson.loadJSONFromAsset("totalparagraphs.json");
+            jsontotalparagraphs = egwJson.getJsonObject(json_data);
+            json_data = egwJson.loadJSONFromAsset("startingdate.json");
+            jsonstartingdate = egwJson.getJsonObject(json_data);
 //            json_data = egwJson.loadJSONFromAsset("egw.json");
             egwmap = egwJson.convertToHashmap();
 
@@ -98,10 +110,17 @@ public class ReadingActivity extends AppCompatActivity {
 //
                     Log.i("adding", book);
                     selectedbooks.add(book);
+
                     ArrayList<LinkedTreeMap<Object,Object>> getbook = egwmap.get(book);
-                    LinkedTreeMap<Object,Object> getparagraph = (LinkedTreeMap) getbook.get(3);
-                    int id = 3;
+                    int totalparagraphs = jsontotalparagraphs.getInt(book);
+                    String startingdate = jsonstartingdate.getString(book);
+                    int id = setCurrentID(startingdate, totalparagraphs);
+                    Log.i("current id", Integer.toString(id));
+                    LinkedTreeMap<Object,Object> getparagraph = (LinkedTreeMap) getbook.get(id);
+
                     String bookcode = book.toString();
+
+
                     String title = jsonObject.getString(book);
                     double page = (Double) getparagraph.get("page");
                     double paragraph = (Double) getparagraph.get("paragraph");
@@ -122,7 +141,40 @@ public class ReadingActivity extends AppCompatActivity {
             }
 
         }
+        loadRecyclerView();
 
+
+    }
+
+
+    private int setCurrentID(String datestring, int totalParagraphs){
+        Long currentID;
+        Date date = new Date();
+        long time = date.getTime();
+        Log.i("datestring", datestring);
+        java.sql.Timestamp startDate = java.sql.Timestamp.valueOf(datestring + " 14:45:00");
+        java.sql.Timestamp current = new java.sql.Timestamp(date.getTime());
+        long then = startDate.getTime();
+        long now = current.getTime();
+        long days = TimeUnit.MILLISECONDS.toDays(now - then)  - 30;
+        currentID = days;
+        while (currentID > totalParagraphs){
+            currentID = currentID - totalParagraphs;
+        }
+        return Integer.parseInt(Long.toString(currentID));
+    }
+
+
+    private void loadRecyclerView(){
+        recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+//
+//        // use this setting to improve performance if you know that changes
+//        // in content do not change the layout size of the RecyclerView
+        recyclerView.setHasFixedSize(false);
+
+        // use a linear layout manager
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
 
         if (reorderedList.isEmpty()){
             Log.i("selectedparagraphs", Integer.toString(selectedparagraphs.size()));
@@ -153,16 +205,7 @@ public class ReadingActivity extends AppCompatActivity {
                 }
             }
             reorderedList.addAll(additems);
-//            ArrayList<String> words = new ArrayList<String>(){};
-//            for (String code : reorderedList){
-//                try {
-//                    JSONArray jsonArray= jsonWritings.getJSONArray(code);
-//                    String word = jsonArray.get(3).toString();
-//                    words.add(word);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
+
             Log.i("selectedparagraphs", Integer.toString(selectedparagraphs.size()));
             Log.i("reorderedlist final", Integer.toString(reorderedList.size()));
             mAdapter = new ReadingAdapter(reorderedList, selectedparagraphs, this);
