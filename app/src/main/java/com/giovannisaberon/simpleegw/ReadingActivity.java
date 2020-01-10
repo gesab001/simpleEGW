@@ -152,11 +152,11 @@ public class ReadingActivity extends AppCompatActivity {
         Date date = new Date();
         long time = date.getTime();
         Log.i("datestring", datestring);
-        java.sql.Timestamp startDate = java.sql.Timestamp.valueOf(datestring + " 14:45:00");
+        java.sql.Timestamp startDate = java.sql.Timestamp.valueOf(datestring + " 00:00:00");
         java.sql.Timestamp current = new java.sql.Timestamp(date.getTime());
         long then = startDate.getTime();
         long now = current.getTime();
-        long days = TimeUnit.MILLISECONDS.toDays(now - then)  - 30;
+        long days = TimeUnit.MILLISECONDS.toDays(now - then);
         currentID = days;
         while (currentID > totalParagraphs){
             currentID = currentID - totalParagraphs;
