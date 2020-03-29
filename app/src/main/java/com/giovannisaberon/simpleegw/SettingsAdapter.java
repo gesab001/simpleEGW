@@ -65,7 +65,7 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.MyView
         final String item = mDataset[position];
 
 //        holder.textView.setText(String.valueOf(position+1)+". " +item);
-        final SharedPreferences pref = context.getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
+        final SharedPreferences pref = context.getApplicationContext().getSharedPreferences("SettingsPref", 0); // 0 - for private mode
         final SharedPreferences.Editor editor = pref.edit();
         try {
             holder.bookswitch.setText(jsonObject.getString(item)+"-"+item);

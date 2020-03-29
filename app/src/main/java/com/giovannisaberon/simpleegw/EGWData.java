@@ -17,6 +17,17 @@ public class EGWData {
         this.word = word;
     }
 
+    public EGWData(String title, int page, int paragraph, String word){
+        this.title = title;
+        this.page = page;
+        this.paragraph = paragraph;
+        this.word = word;
+    }
+
+    public EGWData(String title, String word){
+        this.title = title;
+        this.word = word;
+    }
     public int setId(){
         return this.id;
     }

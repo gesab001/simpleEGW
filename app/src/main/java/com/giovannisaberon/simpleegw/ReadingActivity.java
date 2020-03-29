@@ -11,6 +11,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -45,7 +46,16 @@ public class ReadingActivity extends AppCompatActivity {
     EGWData egwData;
     JSONObject jsonObject = new JSONObject();
     String[] dataset;
-    SharedPreferences pref;
+    private SharedPreferences pref;  // 0 - for private mode
+    private SharedPreferences prefsettings;  // 0 - for private mode
+
+    private SharedPreferences.Editor editor;
+
+//    @Override
+//    public void onVerseSelected(EGWData egwData) {
+//
+//    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,12 +74,15 @@ public class ReadingActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Code here executes on main thread after user presses button
                 loadRecyclerView();
+                Log.i("refresh", selectedparagraphs.get("AA").getTitle());
             }
         });
 
         Resources res = getResources();
         dataset = res.getStringArray(R.array.book_arrays);
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        prefsettings = getApplicationContext().getSharedPreferences("SettingsPref", 0);
+
 
         if(pref.contains("reorderedList")){
             String list = pref.getString("reorderedList", null);
@@ -103,7 +116,8 @@ public class ReadingActivity extends AppCompatActivity {
 //        }
         for(int i=0; i<dataset.length; i++){
             String book = dataset[i];
-            Boolean choice = pref.getBoolean(book, false);
+            Boolean choice = prefsettings.getBoolean(book, false);
+            Log.i("choice", choice.toString());
 //
             if(choice){
                 try {
@@ -161,7 +175,7 @@ public class ReadingActivity extends AppCompatActivity {
         while (currentID > totalParagraphs){
             currentID = currentID - totalParagraphs;
         }
-        return Integer.parseInt(Long.toString(currentID));
+        return Integer.parseInt(Long.toString(currentID))-1;
     }
 
 
@@ -175,10 +189,16 @@ public class ReadingActivity extends AppCompatActivity {
         // use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-
+//        ReadingAdapter.VerseAdapterListener listener = new ReadingAdapter.VerseAdapterListener() {
+//            @Override
+//            public void onVerseSelected(EGWData egwData) {
+////                fullScreen(egwData);
+//            }
+//        };
         if (reorderedList.isEmpty()){
             Log.i("selectedparagraphs", Integer.toString(selectedparagraphs.size()));
-            mAdapter = new ReadingAdapter(selectedbooks, selectedparagraphs, this);
+            mAdapter = new ReadingAdapter(reorderedList, selectedparagraphs, this);
+
 
         }
         else{
@@ -210,11 +230,39 @@ public class ReadingActivity extends AppCompatActivity {
             Log.i("reorderedlist final", Integer.toString(reorderedList.size()));
             mAdapter = new ReadingAdapter(reorderedList, selectedparagraphs, this);
 
+
         }
         ItemTouchHelper.Callback callback =
                 new ItemMoveCallback(mAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
+
+        mAdapter = new ReadingAdapter(reorderedList, selectedparagraphs, this);
         recyclerView.setAdapter(mAdapter);
+        Log.i("loading recylcer view", "loading recycler view");
+    }
+
+    public void fullScreen(EGWData egwData){
+        Toast.makeText(getApplicationContext(), "Selected: " + egwData.getTitle(), Toast.LENGTH_LONG).show();
+        pref = this.getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+//        editor.putString("bookcode", egwData.getBookcode());
+//        editor.putString("book", egwData.getTitle() );
+//        editor.putInt("page", egwData.getPage());
+//        editor.putInt("paragraph", egwData.getParagraph());
+//        editor.putString("word", egwData.getWord() );
+//
+//        editor.commit();
+        Intent intent = new Intent(this, FullscreenActivity.class);
+        intent.putExtra("selectedBook", egwData.getBookcode());
+        intent.putStringArrayListExtra("reorderedList", reorderedList);
+//        for (EGWData egwdata : selectedparagraphs.values()){
+//            editor.putString(egwData.getBookcode(), egwData.toString());
+//            editor.commit();
+//
+//        }
+
+//        intent.putExtra("selectedparagraphs", selectedparagraphs);
+        startActivity(intent);
     }
 }

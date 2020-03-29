@@ -22,6 +22,8 @@ import java.util.HashMap;
 public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
     private ArrayList<String> mDataset;
     private HashMap<String, EGWData> selectedparagraphs;
+
+
     private Context context;
     private SharedPreferences pref;  // 0 - for private mode
     private SharedPreferences.Editor editor;
@@ -43,11 +45,12 @@ public class ReadingAdapter extends RecyclerView.Adapter<ReadingAdapter.MyViewHo
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public ReadingAdapter(ArrayList<String> myDataset, HashMap<String, EGWData> selectedparagraphs, Context context) {
+    public ReadingAdapter(ArrayList<String> myDataset,  HashMap<String, EGWData> selectedparagraphs, Context context) {
 
         mDataset = myDataset;
         this.context = context;
         this.selectedparagraphs = selectedparagraphs;
+
     }
 
     // Create new views (invoked by the layout manager)

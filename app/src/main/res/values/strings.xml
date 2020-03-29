@@ -2,7 +2,7 @@
     <string name="app_name">SimpleEGW</string>
 
     <string-array name="book_arrays">
-    	<item>AA</item>
+		<item>AA</item>
 		<item>AH</item>
 		<item>ApM</item>
 		<item>AY</item>
@@ -130,6 +130,10 @@
 		<item>WLF</item>
 		<item>YRP</item>
     </string-array>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 
 
 </resources>
